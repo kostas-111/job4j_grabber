@@ -5,7 +5,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -25,7 +24,7 @@ public class HabrCareerParse {
     private String retrieveDescription(String link) throws IOException {
         Connection connection = Jsoup.connect(link);
         Document document = connection.get();
-        List <String> description = document.select(".vacancy-description__text").eachText();
+        List<String> description = document.select(".vacancy-description__text").eachText();
         StringBuilder builder = new StringBuilder();
         description.forEach(builder::append);
         return builder.toString();
