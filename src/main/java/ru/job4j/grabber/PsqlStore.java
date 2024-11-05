@@ -82,7 +82,7 @@ public class PsqlStore implements Store {
         return result;
     }
 
-    private Post createPost (ResultSet resultSet) throws SQLException {
+    private Post createPost(ResultSet resultSet) throws SQLException {
         Post result = new Post();
         result.setId(resultSet.getInt(1));
         result.setTitle(resultSet.getString(2));
@@ -97,7 +97,7 @@ public class PsqlStore implements Store {
         PsqlStore sqlStore = new PsqlStore();
         habrCareerParse.list("https://career.habr.com/vacancies?page=1&q=Java+developer&type=all")
                 .forEach(post -> sqlStore.save(post));
-       List <Post> posts = sqlStore.getAll();
+       List<Post> posts = sqlStore.getAll();
        posts.forEach(post ->
                        System.out.println(post.getTitle() + " " + post.getLink() + " " + post.getCreated())
                );
