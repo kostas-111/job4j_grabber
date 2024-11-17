@@ -6,8 +6,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import ru.job4j.grabber.utils.DateTimeParser;
-import ru.job4j.grabber.utils.HabrCareerDateTimeParser;
-
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -68,14 +66,16 @@ public class HabrCareerParse implements Parse {
         return result;
     }
 
-    public static void main(String[] args) throws IOException {
-        int pageNumber = 5;
-        for (int i = 1; i <= pageNumber;  i++) {
-            HabrCareerParse habrCareerParse = new HabrCareerParse(new HabrCareerDateTimeParser());
-            habrCareerParse.list("%s%s%d%s".formatted(SOURCE_LINK, PREFIX, i, SUFFIX))
-                    .forEach(post -> {
-                        System.out.println(post.getTitle() + " " + post.getLink() + " " + post.getCreated());
-                    });
-        }
+    /**
+     * Метод, возвращающий строку с адресом с подстановкой номера страницы.
+     * По постановке программа должна парсить первые пять страниц сайта.
+     * Добавил этот метод чтобы в классе Grabber реализовать парсинг
+     * первых пяти страниц в цикле
+     * @param pageNumber - ссылка на вакансию.
+     * @return - готовая для парсинга ссылка на страницу сайта.
+     */
+    @Override
+    public String getSourceLink(int pageNumber) {
+        return "%s%s%d%s".formatted(SOURCE_LINK, PREFIX, pageNumber, SUFFIX);
     }
 }
