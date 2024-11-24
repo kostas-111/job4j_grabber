@@ -16,21 +16,10 @@ import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 public class Grabber implements Grab {
-    private final Parse parse;
-    private final Store store;
-    private final Scheduler scheduler;
-    private final int time;
-
-    public Grabber(Parse parse, Store store, Scheduler scheduler, int time) {
-        this.parse = parse;
-        this.store = store;
-        this.scheduler = scheduler;
-        this.time = time;
-    }
-
     @Override
-    public void init() throws SchedulerException {
+    public void init(Parse parse, Store store, Scheduler scheduler) throws SchedulerException, IOException {
         int pageCount = 5;
+        int time = Integer.parseInt(cfg().getProperty("time"));
         JobDataMap data = new JobDataMap();
         data.put("store", store);
         data.put("parse", parse);
@@ -97,7 +86,7 @@ public class Grabber implements Grab {
     метод для получения объекта типа Properties,
     чтобы получать значения из конфиг-файла в используемых методах
      */
-    private static Properties cfg() throws IOException {
+    private Properties cfg() throws IOException {
         try (InputStream input = Grabber.class.getClassLoader()
                 .getResourceAsStream("app.properties")) {
             Properties config = new Properties();
@@ -106,14 +95,28 @@ public class Grabber implements Grab {
         }
     }
 
-    public static void main(String[] args) throws Exception {
+    /*
+    метод для запуска шедуллера
+     */
+    private Scheduler scheduler() throws SchedulerException {
         Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
         scheduler.start();
-        var parse = new HabrCareerParse(new HabrCareerDateTimeParser());
-        var store = new PsqlStore();
-        var time = Integer.parseInt(cfg().getProperty("time"));
-        Grabber grab = new Grabber(parse, store, scheduler, time);
-        grab.init();
+        return scheduler;
+    }
+
+    /*
+    метод для получения объекта Store
+     */
+    private Store store() {
+        return new PsqlStore();
+    }
+
+    public static void main(String[] args) throws Exception {
+        Grabber grab = new Grabber();
+        grab.cfg();
+        Scheduler scheduler = grab.scheduler();
+        Store store = grab.store();
+        grab.init(new HabrCareerParse(new HabrCareerDateTimeParser()), store, scheduler);
         grab.web(store);
     }
 }
